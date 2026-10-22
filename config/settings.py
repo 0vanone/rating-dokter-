@@ -23,6 +23,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -69,6 +70,12 @@ else:
         }
     }
 
+# Di hosting (Render), alamat database dibaca dari DATABASE_URL.
+if os.environ.get("DATABASE_URL"):
+    import dj_database_url
+
+    DATABASES = {"default": dj_database_url.config(conn_max_age=600)}
+
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -82,6 +89,19 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = "static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+}
+
+# Hosting memakai HTTPS lewat proxy: login dashboard butuh dua pengaturan ini.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+CSRF_TRUSTED_ORIGINS = [
+    o.strip()
+    for o in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if o.strip()
+]
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
