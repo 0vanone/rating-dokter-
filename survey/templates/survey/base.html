@@ -1,0 +1,40 @@
+{% load static %}<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Rating Dokter{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'survey/style.css' %}">
+</head>
+<body>
+  <main class="halaman">
+    {% if langkah %}
+    <header class="progres">
+      <p class="progres-teks">Langkah {{ langkah }} dari 4</p>
+      <div class="progres-bar" aria-hidden="true">
+        {% for i in "1234" %}<span class="{% if forloop.counter <= langkah %}isi{% endif %}"></span>{% endfor %}
+      </div>
+    </header>
+    {% endif %}
+
+    {% for pesan in messages %}<p class="galat" role="alert">{{ pesan }}</p>{% endfor %}
+
+    {% block isi %}{% endblock %}
+  </main>
+
+  <div id="toast" class="toast" role="alert" hidden></div>
+  <script>
+    function tampilkanToast(teks) {
+      const el = document.getElementById("toast");
+      el.textContent = teks;
+      el.hidden = false;
+      clearTimeout(el._t);
+      el._t = setTimeout(() => { el.hidden = true; }, 5000);
+    }
+  </script>
+  {% block skrip %}{% endblock %}
+</body>
+</html>

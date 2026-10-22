@@ -1,0 +1,59 @@
+{% load static %}<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Dashboard{% endblock %} - Rating Dokter</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'survey/dashboard.css' %}">
+</head>
+<body class="dash">
+  <aside class="samping">
+    <div class="merek">
+      <span class="merek-tanda" aria-hidden="true"></span>
+      <div><strong>Rating Dokter</strong><small>Back-office rumah sakit</small></div>
+    </div>
+
+    <nav class="menu" aria-label="Menu utama">
+      <a href="{% url 'dashboard:ringkasan' %}" class="{% if menu == 'ringkasan' %}aktif{% endif %}">Ringkasan</a>
+      <a href="{% url 'dashboard:peringkat' %}" class="{% if menu == 'peringkat' %}aktif{% endif %}">Peringkat dokter</a>
+      <a href="{% url 'dashboard:komplain' %}" class="{% if menu == 'komplain' %}aktif{% endif %}">
+        Red Alert{% if nav_komplain %}<span class="lencana">{{ nav_komplain }}</span>{% endif %}
+      </a>
+
+      <p class="menu-judul">Data master</p>
+      <a href="{% url 'dashboard:dokter' %}" class="{% if menu == 'dokter' %}aktif{% endif %}">Dokter</a>
+      <a href="{% url 'dashboard:poli' %}" class="{% if menu == 'poli' %}aktif{% endif %}">Poliklinik</a>
+      <a href="{% url 'dashboard:pertanyaan' %}" class="{% if menu == 'pertanyaan' %}aktif{% endif %}">Bank pertanyaan</a>
+
+      <p class="menu-judul">Lainnya</p>
+      <a href="{% url 'dashboard:qr' %}" class="{% if menu == 'qr' %}aktif{% endif %}">QR Code Center</a>
+      <a href="{% url 'dashboard:laporan' %}" class="{% if menu == 'laporan' %}aktif{% endif %}">Laporan</a>
+      <a href="{% url 'dashboard:akun' %}" class="{% if menu == 'akun' %}aktif{% endif %}">Akun admin</a>
+    </nav>
+
+    <div class="pengguna">
+      <p>{% firstof request.user.get_full_name request.user.username %}</p>
+      <form method="post" action="{% url 'dashboard:keluar' %}">{% csrf_token %}
+        <button type="submit" class="tautan-tombol">Keluar</button>
+      </form>
+    </div>
+  </aside>
+
+  <main class="isi">
+    <header class="kepala">
+      <div>
+        <h1>{% block judul %}{% endblock %}</h1>
+        {% block sub %}{% endblock %}
+      </div>
+      <div class="kepala-aksi">{% block aksi %}{% endblock %}</div>
+    </header>
+
+    {% for pesan in messages %}<p class="pesan {{ pesan.tags }}" role="status">{{ pesan }}</p>{% endfor %}
+
+    {% block konten %}{% endblock %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,29 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Laporan{% endblock %}
+{% block judul %}Laporan{% endblock %}
+{% block sub %}<p class="sub">Unduh rekap survei dan statistik untuk bahan rapat direksi.</p>{% endblock %}
+
+{% block konten %}
+<section class="panel sempit">
+  <form method="get" class="form-isi">
+    <div class="bidang">
+      <label for="periode">Periode laporan</label>
+      <select name="periode" id="periode" onchange="this.form.submit()">
+        {% for kode, nama in daftar_periode %}<option value="{{ kode }}" {% if kode == periode %}selected{% endif %}>{{ nama }}</option>{% endfor %}
+      </select>
+    </div>
+  </form>
+
+  <dl class="rincian">
+    <dt>Total survei</dt><dd>{{ data.total }}</dd>
+    <dt>Skor rerata RS</dt><dd>{{ data.rata|floatformat:2|default:"-" }} / 5.00</dd>
+    <dt>Komplain aktif</dt><dd>{{ data.komplain_aktif }}</dd>
+  </dl>
+
+  <div class="aksi-form">
+    <a class="tombol" href="{% url 'dashboard:laporan_xlsx' %}?periode={{ periode }}">Unduh Excel (.xlsx)</a>
+    <a class="tombol sekunder" href="{% url 'dashboard:laporan_pdf' %}?periode={{ periode }}">Unduh PDF</a>
+  </div>
+  <p class="sub">Excel berisi tiga lembar: Ringkasan, Peringkat Dokter, dan Data Survei lengkap. PDF berisi ringkasan, skor per poli, dan peringkat dokter.</p>
+</section>
+{% endblock %}

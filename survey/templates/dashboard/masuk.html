@@ -1,0 +1,24 @@
+{% extends "survey/base.html" %}
+{% block title %}Masuk - Dashboard Rating Dokter{% endblock %}
+{% block isi %}
+<h1>Masuk ke dashboard</h1>
+<p class="pengantar">Khusus staf rumah sakit yang memiliki akun admin.</p>
+
+{% if form.errors %}
+<p class="galat" role="alert">Username atau kata sandi salah. Periksa lagi, lalu coba kembali.</p>
+{% endif %}
+
+<form method="post" class="form">
+  {% csrf_token %}
+  <input type="hidden" name="next" value="{{ next }}">
+  <label class="bidang">
+    <span>Username</span>
+    <input type="text" name="username" autocomplete="username" autofocus required>
+  </label>
+  <label class="bidang">
+    <span>Kata sandi</span>
+    <input type="password" name="password" autocomplete="current-password" required>
+  </label>
+  <button type="submit" class="tombol">Masuk</button>
+</form>
+{% endblock %}

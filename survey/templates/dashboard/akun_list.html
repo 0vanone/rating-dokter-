@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Akun admin{% endblock %}
+{% block judul %}Akun admin{% endblock %}
+{% block sub %}<p class="sub">Staf yang boleh masuk ke dashboard ini, misalnya Admin CS, Kepala Humas, atau Direktur RS.</p>{% endblock %}
+{% block aksi %}<a class="tombol" href="{% url 'dashboard:akun_baru' %}">Tambah akun</a>{% endblock %}
+
+{% block konten %}
+<div class="tabel-bungkus">
+<table class="tabel">
+  <thead><tr><th>Nama</th><th>Username</th><th>Terakhir masuk</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for u in daftar %}
+    <tr>
+      <td><strong>{{ u.get_full_name|default:"-" }}</strong></td>
+      <td>{{ u.username }}</td>
+      <td>{{ u.last_login|date:"d M Y H:i"|default:"Belum pernah" }}</td>
+      <td>{% if u.is_active %}<span class="status status-resolved">Aktif</span>{% else %}<span class="status status-nonaktif">Nonaktif</span>{% endif %}</td>
+      <td class="aksi-baris">
+        <a class="tombol-kecil" href="{% url 'dashboard:akun_password' u.pk %}">Ganti kata sandi</a>
+        {% if u.pk != request.user.pk %}
+        <form method="post" action="{% url 'dashboard:akun_toggle' u.pk %}">{% csrf_token %}
+          <button type="submit" class="tombol-kecil {% if u.is_active %}bahaya{% endif %}">{% if u.is_active %}Nonaktifkan{% else %}Aktifkan{% endif %}</button>
+        </form>
+        {% endif %}
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

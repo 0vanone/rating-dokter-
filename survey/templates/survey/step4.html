@@ -1,0 +1,16 @@
+{% extends "survey/base.html" %}
+{% block title %}Terima kasih - Rating Dokter{% endblock %}
+{% block isi %}
+<section class="selesai">
+  <h1>Terima kasih.</h1>
+  <p class="pengantar">Penilaian Anda untuk {{ nama_dokter }} sudah tersimpan.</p>
+  <p class="kecil">Halaman ini akan kembali ke awal dalam beberapa detik.</p>
+  <a class="tautan" href="{% url 'survey:step1' %}">Isi survei lain</a>
+</section>
+{% endblock %}
+
+{% block skrip %}
+<script>
+  setTimeout(() => { window.location.href = "{% url 'survey:step1' %}"; }, 5000);
+</script>
+{% endblock %}

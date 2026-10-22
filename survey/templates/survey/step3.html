@@ -1,0 +1,45 @@
+{% extends "survey/base.html" %}
+{% block title %}Saran - Rating Dokter{% endblock %}
+{% block isi %}
+<h1>Ada saran untuk {{ dokter.nama }}?</h1>
+<p class="pengantar">Bagian ini boleh dikosongkan. Masukan Anda dibaca oleh pihak rumah sakit untuk memperbaiki pelayanan.</p>
+
+<form method="post" class="form" id="form-kirim">
+  {% csrf_token %}
+  <label class="bidang">
+    <span>Saran atau catatan</span>
+    <textarea name="saran" rows="6" maxlength="1000" placeholder="Tulis di sini"></textarea>
+  </label>
+
+  <div class="aksi">
+    <a class="tautan" href="{% url 'survey:step2' %}">Kembali</a>
+    <button type="submit" class="tombol" id="tombol-kirim">Kirim penilaian</button>
+  </div>
+</form>
+{% endblock %}
+
+{% block skrip %}
+<script>
+  const form = document.getElementById("form-kirim");
+  const tombol = document.getElementById("tombol-kirim");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    tombol.disabled = true;
+    tombol.textContent = "Mengirim...";
+    try {
+      const res = await fetch(form.action || window.location.href, {
+        method: "POST",
+        body: new FormData(form),
+        credentials: "same-origin",
+      });
+      if (!res.ok) throw new Error("gagal");
+      window.location.href = res.url;
+    } catch (err) {
+      tampilkanToast("Koneksi terputus, silakan periksa internet Anda dan coba lagi.");
+      tombol.disabled = false;
+      tombol.textContent = "Kirim penilaian";
+    }
+  });
+</script>
+{% endblock %}

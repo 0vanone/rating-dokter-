@@ -1,0 +1,34 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Red Alert{% endblock %}
+{% block judul %}Red Alert: komplain pasien{% endblock %}
+{% block sub %}<p class="sub">Ulasan dengan skor rerata 2.0 atau kurang, atau yang saran tertulisnya berisi keluhan kritis, masuk otomatis ke sini.</p>{% endblock %}
+
+{% block konten %}
+<div class="tab tab-lebar">
+  <a href="{% url 'dashboard:komplain' %}" class="{% if not status %}aktif{% endif %}">Semua <span class="hitung">{{ total }}</span></a>
+  {% for kode, nama, n in tab_status %}
+  <a href="?status={{ kode }}" class="{% if status == kode %}aktif{% endif %}">{{ nama }} <span class="hitung">{{ n }}</span></a>
+  {% endfor %}
+</div>
+
+<div class="tabel-bungkus">
+<table class="tabel">
+  <thead><tr><th>Kunjungan</th><th>Pasien</th><th>Dokter</th><th class="angka">Skor</th><th>Keluhan</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for k in daftar %}
+    <tr>
+      <td>{{ k.survei.tanggal_kunjungan|date:"d M Y" }}</td>
+      <td><strong>{{ k.survei.nama_pasien }}</strong><br><small>{{ k.survei.no_hp|default:"Tanpa nomor HP" }}</small></td>
+      <td>{{ k.survei.dokter.nama }}<br><small>{{ k.survei.dokter.poliklinik.nama }}</small></td>
+      <td class="angka"><strong class="skor {% if k.survei.skor_rata <= 2 %}rendah{% endif %}">{{ k.survei.skor_rata|floatformat:2 }}</strong></td>
+      <td class="keluhan">{{ k.survei.saran|default:"(tanpa saran tertulis)"|truncatechars:90 }}<br><small>{{ k.alasan }}</small></td>
+      <td><span class="status status-{{ k.status }}">{{ k.get_status_display }}</span></td>
+      <td><a class="tombol-kecil" href="{% url 'dashboard:komplain_detail' k.pk %}">Tindak lanjut</a></td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7" class="kosong">Tidak ada komplain pada filter ini.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

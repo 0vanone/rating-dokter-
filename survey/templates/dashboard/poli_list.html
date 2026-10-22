@@ -1,0 +1,25 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Poliklinik{% endblock %}
+{% block judul %}Poliklinik{% endblock %}
+{% block aksi %}<a class="tombol" href="{% url 'dashboard:poli_baru' %}">Tambah poliklinik</a>{% endblock %}
+
+{% block konten %}
+<div class="tabel-bungkus">
+<table class="tabel">
+  <thead><tr><th>Poliklinik</th><th class="angka">Dokter</th><th class="angka">Pertanyaan aktif</th><th></th></tr></thead>
+  <tbody>
+    {% for p in daftar %}
+    <tr>
+      <td><strong>{{ p.nama }}</strong></td>
+      <td class="angka">{{ p.jumlah_dokter }}</td>
+      <td class="angka">{{ p.jumlah_soal }}</td>
+      <td class="aksi-baris">
+        <a class="tombol-kecil" href="{% url 'dashboard:pertanyaan' %}?poli={{ p.pk }}">Pertanyaan</a>
+        <a class="tombol-kecil" href="{% url 'dashboard:poli_ubah' p.pk %}">Ubah</a>
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="4" class="kosong">Belum ada poliklinik.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

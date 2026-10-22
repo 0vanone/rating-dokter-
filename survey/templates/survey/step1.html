@@ -1,0 +1,41 @@
+{% extends "survey/base.html" %}
+{% block title %}Mulai - Rating Dokter{% endblock %}
+{% block isi %}
+<h1>Bagaimana pelayanan dokter Anda?</h1>
+<p class="pengantar">Isi data singkat dan pilih dokter yang merawat Anda, lalu jawab beberapa pertanyaan. Sekitar dua menit.</p>
+
+{% if galat %}
+<ul class="galat" role="alert">{% for g in galat %}<li>{{ g }}</li>{% endfor %}</ul>
+{% endif %}
+
+<form method="post" class="form">
+  {% csrf_token %}
+
+  <label class="bidang">
+    <span>Nama</span>
+    <input type="text" name="nama_pasien" value="{{ nilai.nama_pasien }}" maxlength="120" autocomplete="name" required>
+  </label>
+
+  <label class="bidang">
+    <span>Nomor HP <small>(boleh dikosongkan)</small></span>
+    <input type="tel" name="no_hp" value="{{ nilai.no_hp }}" maxlength="20" autocomplete="tel" inputmode="tel">
+  </label>
+
+  <label class="bidang">
+    <span>Dokter yang merawat Anda</span>
+    <select name="dokter" required>
+      <option value="">Pilih dokter</option>
+      {% regroup daftar_dokter by poliklinik as per_poli %}
+      {% for grup in per_poli %}
+      <optgroup label="{{ grup.grouper.nama }}">
+        {% for d in grup.list %}
+        <option value="{{ d.id }}" {% if d.id == dokter_terpilih %}selected{% endif %}>{{ d.nama }}</option>
+        {% endfor %}
+      </optgroup>
+      {% endfor %}
+    </select>
+  </label>
+
+  <button type="submit" class="tombol">Lanjut ke pertanyaan</button>
+</form>
+{% endblock %}

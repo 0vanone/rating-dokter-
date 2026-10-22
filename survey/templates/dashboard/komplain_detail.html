@@ -1,0 +1,56 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Komplain #{{ k.pk }}{% endblock %}
+{% block judul %}Komplain #{{ k.pk }}{% endblock %}
+{% block sub %}<p class="sub"><span class="status status-{{ k.status }}">{{ k.get_status_display }}</span> &nbsp; {{ k.alasan }}</p>{% endblock %}
+{% block aksi %}<a class="tautan" href="{% url 'dashboard:komplain' %}">Kembali ke daftar</a>{% endblock %}
+
+{% block konten %}
+<div class="dua-kolom lebar-kiri">
+  <section class="panel">
+    <h2>Isi ulasan</h2>
+    <dl class="rincian">
+      <dt>Pasien</dt><dd>{{ k.survei.nama_pasien }}</dd>
+      <dt>Nomor HP</dt><dd>{{ k.survei.no_hp|default:"Tidak diisi" }}</dd>
+      <dt>Tanggal kunjungan</dt><dd>{{ k.survei.tanggal_kunjungan|date:"d F Y" }}</dd>
+      <dt>Dokter</dt><dd>{{ k.survei.dokter.nama }} ({{ k.survei.dokter.poliklinik.nama }})</dd>
+      <dt>Skor rerata</dt><dd><strong class="skor {% if k.survei.skor_rata <= 2 %}rendah{% endif %}">{{ k.survei.skor_rata|floatformat:2 }}</strong> / 5.00</dd>
+    </dl>
+
+    <h3>Saran dari pasien</h3>
+    <blockquote class="kutipan">{{ k.survei.saran|default:"(pasien tidak menulis saran)"|linebreaksbr }}</blockquote>
+
+    <h3>Jawaban per pertanyaan</h3>
+    <table class="tabel tabel-rapat">
+      <thead><tr><th>Pertanyaan</th><th>Jawaban</th><th class="angka">Skor</th></tr></thead>
+      <tbody>
+        {% for j in jawaban %}<tr><td>{{ j.pertanyaan.teks }}</td><td>{{ j.opsi.label }}</td><td class="angka">{{ j.skor }}</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Tindak lanjut</h2>
+    <form method="post" class="form-isi">
+      {% csrf_token %}
+      <div class="bidang">
+        <label for="status">Status penanganan</label>
+        <select name="status" id="status">
+          {% for kode, nama in daftar_status %}<option value="{{ kode }}" {% if kode == k.status %}selected{% endif %}>{{ nama }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="bidang">
+        <label for="catatan">Tambah catatan (misalnya hasil menghubungi pasien)</label>
+        <textarea name="catatan" id="catatan" rows="4"></textarea>
+      </div>
+      <button type="submit" class="tombol">Simpan</button>
+    </form>
+
+    <h3>Log tindak lanjut</h3>
+    {% if k.catatan_tindak_lanjut %}
+    <p class="log">{{ k.catatan_tindak_lanjut|linebreaksbr }}</p>
+    {% else %}
+    <p class="kosong">Belum ada catatan.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

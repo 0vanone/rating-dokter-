@@ -1,0 +1,37 @@
+{% extends "survey/base.html" %}
+{% block title %}Pertanyaan - Rating Dokter{% endblock %}
+{% block isi %}
+<h1>Pengalaman Anda dengan {{ dokter.nama }}</h1>
+<p class="pengantar">{{ dokter.poliklinik.nama }}. Pilih satu jawaban untuk setiap pertanyaan.</p>
+
+{% if galat %}
+<ul class="galat" role="alert">{% for g in galat %}<li>{{ g }}</li>{% endfor %}</ul>
+{% endif %}
+
+{% if pertanyaan %}
+<form method="post" class="form">
+  {% csrf_token %}
+  {% for p in pertanyaan %}
+  <fieldset class="pertanyaan">
+    <legend>{{ p.teks }}</legend>
+    <div class="chips">
+      {% for o in p.opsi.all %}
+      <label class="chip">
+        <input type="radio" name="p{{ p.id }}" value="{{ o.id }}" {% if o.id == p.terpilih %}checked{% endif %} required>
+        <span>{{ o.label }}</span>
+      </label>
+      {% endfor %}
+    </div>
+  </fieldset>
+  {% endfor %}
+
+  <div class="aksi">
+    <a class="tautan" href="{% url 'survey:step1' %}">Kembali</a>
+    <button type="submit" class="tombol">Lanjut</button>
+  </div>
+</form>
+{% else %}
+<p class="galat">Kuesioner untuk poliklinik ini belum tersedia. Mohon beri tahu petugas.</p>
+<a class="tautan" href="{% url 'survey:step1' %}">Kembali</a>
+{% endif %}
+{% endblock %}

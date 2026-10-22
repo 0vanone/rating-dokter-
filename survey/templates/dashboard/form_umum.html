@@ -1,0 +1,31 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ judul }}{% endblock %}
+{% block judul %}{{ judul }}{% endblock %}
+
+{% block konten %}
+<section class="panel sempit">
+  <form method="post" class="form-isi" {% if form.is_multipart %}enctype="multipart/form-data"{% endif %}>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<p class="pesan error">{{ form.non_field_errors|join:" " }}</p>{% endif %}
+    {% for f in form %}
+    <div class="bidang">
+      <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+      {{ f }}
+      {% if f.help_text %}<small>{{ f.help_text }}</small>{% endif %}
+      {% for e in f.errors %}<p class="ralat">{{ e }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+    <div class="aksi-form">
+      <button type="submit" class="tombol">Simpan</button>
+      <a class="tautan" href="{{ kembali }}">Batal</a>
+    </div>
+  </form>
+
+  {% if hapus %}
+  <form method="post" action="{{ hapus }}" class="zona-hapus" onsubmit="return confirm('Hapus data ini? Tindakan ini tidak bisa dibatalkan.');">
+    {% csrf_token %}
+    <button type="submit" class="tombol-bahaya">Hapus</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

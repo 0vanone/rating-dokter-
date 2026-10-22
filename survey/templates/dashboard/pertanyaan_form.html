@@ -1,0 +1,44 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{% if objek %}Ubah pertanyaan{% else %}Tambah pertanyaan{% endif %}{% endblock %}
+{% block judul %}{% if objek %}Ubah pertanyaan{% else %}Tambah pertanyaan{% endif %}{% endblock %}
+
+{% block konten %}
+<form method="post" class="form-isi">
+  {% csrf_token %}
+  <section class="panel sempit">
+    {% for f in form %}
+    <div class="bidang">
+      <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+      {{ f }}
+      {% for e in f.errors %}<p class="ralat">{{ e }}</p>{% endfor %}
+    </div>
+    {% endfor %}
+  </section>
+
+  <section class="panel sempit">
+    <h2>Pilihan jawaban dan bobot</h2>
+    <p class="sub">Minimal dua pilihan. Bobot 1 sampai 5: makin tinggi makin baik. Centang "Hapus" untuk membuang satu pilihan.</p>
+    {{ formset.management_form }}
+    {% if formset.non_form_errors %}<p class="ralat">{{ formset.non_form_errors|join:" " }}</p>{% endif %}
+    <table class="tabel tabel-rapat tabel-opsi">
+      <thead><tr><th>Teks pilihan</th><th>Bobot</th><th>Urutan</th><th>Hapus</th></tr></thead>
+      <tbody>
+        {% for f in formset %}
+        <tr>
+          <td>{% for h in f.hidden_fields %}{{ h }}{% endfor %}{{ f.label }}{% for e in f.label.errors %}<p class="ralat">{{ e }}</p>{% endfor %}</td>
+          <td>{{ f.skor }}{% for e in f.skor.errors %}<p class="ralat">{{ e }}</p>{% endfor %}</td>
+          <td>{{ f.urutan }}</td>
+          <td>{% if f.instance.pk %}{{ f.DELETE }}{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <p class="sub">Butuh pilihan tambahan? Simpan dulu, lalu buka lagi halaman ini untuk menambah baris kosong.</p>
+  </section>
+
+  <div class="aksi-form">
+    <button type="submit" class="tombol">Simpan</button>
+    <a class="tautan" href="{% url 'dashboard:pertanyaan' %}">Batal</a>
+  </div>
+</form>
+{% endblock %}

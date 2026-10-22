@@ -1,0 +1,84 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Ringkasan{% endblock %}
+{% block judul %}Ringkasan{% endblock %}
+{% block sub %}<p class="sub">Gambaran cepat kepuasan pasien, {{ label_periode|lower }}.</p>{% endblock %}
+{% block aksi %}
+<form method="get" class="saring">
+  <input type="hidden" name="tren" value="{{ granular }}">
+  <label>Periode
+    <select name="periode" onchange="this.form.submit()">
+      {% for kode, nama in daftar_periode %}<option value="{{ kode }}" {% if kode == periode %}selected{% endif %}>{{ nama }}</option>{% endfor %}
+    </select>
+  </label>
+</form>
+{% endblock %}
+
+{% block konten %}
+<section class="kartu-statistik" aria-label="Ringkasan utama">
+  <div class="statistik">
+    <p class="statistik-label">Total survei masuk</p>
+    <p class="statistik-nilai">{{ data.total }}</p>
+  </div>
+  <div class="statistik">
+    <p class="statistik-label">Skor rerata RS</p>
+    <p class="statistik-nilai">{{ data.rata|floatformat:2|default:"-" }}<small> / 5.00</small></p>
+  </div>
+  <a class="statistik {% if data.komplain_aktif %}waspada{% endif %}" href="{% url 'dashboard:komplain' %}">
+    <p class="statistik-label">Total komplain aktif</p>
+    <p class="statistik-nilai">{{ data.komplain_aktif }}</p>
+  </a>
+</section>
+
+<section class="panel">
+  <div class="panel-kepala">
+    <h2>Tren kepuasan</h2>
+    <div class="tab" role="tablist">
+      <a href="?periode={{ periode }}&tren=harian" class="{% if granular == 'harian' %}aktif{% endif %}">Harian</a>
+      <a href="?periode={{ periode }}&tren=mingguan" class="{% if granular == 'mingguan' %}aktif{% endif %}">Mingguan</a>
+      <a href="?periode={{ periode }}&tren=bulanan" class="{% if granular == 'bulanan' %}aktif{% endif %}">Bulanan</a>
+    </div>
+  </div>
+  <p class="sub">Skor rerata per periode (skala 1 sampai 5). Grafik menampilkan 30 hari, 12 minggu, atau 12 bulan terakhir.</p>
+  <div class="tren" role="img" aria-label="Grafik batang tren skor kepuasan">
+    {% for t in tren %}
+    <div class="tren-kolom" title="{{ t.label }}: skor {{ t.rata|floatformat:2 }} dari {{ t.n }} survei">
+      <span class="tren-nilai">{{ t.rata|floatformat:1 }}</span>
+      <span class="tren-area"><span class="tren-bar {% if t.rata <= 2 %}rendah{% endif %}" style="height: {{ t.tinggi }}%"></span></span>
+      <span class="tren-label">{{ t.label }}</span>
+    </div>
+    {% empty %}
+    <p class="kosong">Belum ada data survei untuk ditampilkan.</p>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="dua-kolom">
+  <section class="panel">
+    <h2>Skor per poliklinik</h2>
+    <ul class="daftar-bar">
+      {% for p in poli %}
+      <li>
+        <div class="daftar-bar-atas"><span>{{ p.nama }}</span><strong>{{ p.rata|floatformat:2|default:"-" }}</strong></div>
+        <div class="bar"><span style="width: {{ p.lebar }}%"></span></div>
+        <small>{{ p.jumlah }} responden</small>
+      </li>
+      {% empty %}<li class="kosong">Belum ada poliklinik.</li>{% endfor %}
+    </ul>
+  </section>
+
+  <section class="panel">
+    <div class="panel-kepala"><h2>Perlu ditangani</h2><a class="tautan" href="{% url 'dashboard:komplain' %}">Lihat semua</a></div>
+    <ul class="daftar-tiket">
+      {% for k in terbaru %}
+      <li>
+        <a href="{% url 'dashboard:komplain_detail' k.pk %}">
+          <span class="tiket-judul">{{ k.survei.dokter.nama }} <small>{{ k.survei.dokter.poliklinik.nama }}</small></span>
+          <span class="tiket-isi">{{ k.survei.saran|default:"(tanpa saran tertulis)"|truncatechars:70 }}</span>
+          <span class="status status-{{ k.status }}">{{ k.get_status_display }}</span>
+        </a>
+      </li>
+      {% empty %}<li class="kosong">Tidak ada komplain yang menunggu.</li>{% endfor %}
+    </ul>
+  </section>
+</div>
+{% endblock %}

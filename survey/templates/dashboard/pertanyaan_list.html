@@ -1,0 +1,33 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Bank pertanyaan{% endblock %}
+{% block judul %}Bank pertanyaan{% endblock %}
+{% block sub %}<p class="sub">Pertanyaan yang tampil kepada pasien mengikuti poliklinik dokter yang dipilih.</p>{% endblock %}
+{% block aksi %}<a class="tombol" href="{% url 'dashboard:pertanyaan_baru' %}{% if poli_id %}?poli={{ poli_id }}{% endif %}">Tambah pertanyaan</a>{% endblock %}
+
+{% block konten %}
+<div class="tab tab-lebar">
+  <a href="{% url 'dashboard:pertanyaan' %}" class="{% if not poli_id %}aktif{% endif %}">Semua poli</a>
+  {% for p in daftar_poli %}<a href="?poli={{ p.id }}" class="{% if p.id == poli_id %}aktif{% endif %}">{{ p.nama }}</a>{% endfor %}
+</div>
+
+<div class="tabel-bungkus">
+<table class="tabel">
+  <thead><tr><th class="rank">#</th><th>Pertanyaan</th><th>Poliklinik</th><th>Pilihan jawaban (bobot)</th><th>Status</th><th></th></tr></thead>
+  <tbody>
+    {% for q in daftar %}
+    <tr>
+      <td class="rank">{{ q.urutan }}</td>
+      <td>{{ q.teks }}</td>
+      <td>{{ q.poliklinik.nama }}</td>
+      <td class="chips-kecil">{% for o in q.opsi.all %}<span>{{ o.label }} <b>{{ o.skor }}</b></span>{% endfor %}</td>
+      <td>{% if q.aktif %}<span class="status status-resolved">Aktif</span>{% else %}<span class="status status-nonaktif">Nonaktif</span>{% endif %}</td>
+      <td class="aksi-baris">
+        <a class="tombol-kecil" href="{% url 'dashboard:pertanyaan_ubah' q.pk %}">Ubah</a>
+        <form method="post" action="{% url 'dashboard:pertanyaan_hapus' q.pk %}" onsubmit="return confirm('Hapus pertanyaan ini?');">{% csrf_token %}<button type="submit" class="tombol-kecil bahaya">Hapus</button></form>
+      </td>
+    </tr>
+    {% empty %}<tr><td colspan="6" class="kosong">Belum ada pertanyaan.</td></tr>{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

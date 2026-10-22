@@ -1,0 +1,44 @@
+{% extends "dashboard/base.html" %}
+{% block title %}QR Code Center{% endblock %}
+{% block judul %}QR Code Center{% endblock %}
+{% block sub %}<p class="sub">Satu QR pusat untuk seluruh area rumah sakit. Cetak di papan nama, meja pendaftaran, atau banner.</p>{% endblock %}
+
+{% block konten %}
+<div class="dua-kolom lebar-kanan">
+  <section class="panel">
+    <h2>Alamat survei</h2>
+    <form method="get" class="form-isi">
+      <div class="bidang">
+        <label for="url">Alamat yang dibuka pasien setelah scan</label>
+        <input type="text" id="url" name="url" value="{{ url }}" inputmode="url">
+        <small>Pasien membuka alamat ini dari HP mereka, jadi harus alamat yang bisa dijangkau dari luar laptop ini.</small>
+      </div>
+      <button type="submit" class="tombol">Perbarui QR</button>
+    </form>
+
+    {% if alamat_lokal %}
+    <p class="pesan warning">Alamat ini memakai <b>localhost</b>, sehingga HP tidak bisa membukanya. Ganti dengan IP laptop atau alamat server rumah sakit, misalnya <b>http://192.168.1.10:8000/</b>, lalu klik Perbarui QR.</p>
+    {% endif %}
+    {% if not url_valid %}
+    <p class="pesan error">Alamat harus diawali http:// atau https://</p>
+    {% endif %}
+
+    {% if url_valid %}
+    <h3>Unduh untuk dicetak</h3>
+    <div class="aksi-form">
+      <a class="tombol" href="{% url 'dashboard:qr_unduh' %}?format=png&url={{ url|urlencode }}">Unduh PNG resolusi tinggi</a>
+      <a class="tombol sekunder" href="{% url 'dashboard:qr_unduh' %}?format=pdf&url={{ url|urlencode }}">Unduh PDF</a>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="panel qr-panel">
+    {% if url_valid %}
+    <img class="qr" src="{% url 'dashboard:qr_gambar' %}?url={{ url|urlencode }}" alt="QR code survei kepuasan pasien">
+    <p class="sub">Scan untuk membuka survei.</p>
+    {% else %}
+    <p class="kosong">QR akan tampil setelah alamat valid.</p>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}
